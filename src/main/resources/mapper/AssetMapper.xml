@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="fingertips.backend.asset.mapper.AssetMapper">
+    <select id="getAllAssets" resultType="AssetDTO">
+        SELECT
+            a.asset_idx AS assetIdx,
+            a.asset_type AS assetType,
+            a.bank_name AS bankName,
+            a.asset_name AS assetName,
+            a.asset_image AS assetImage,
+            a.connected_status AS connectedStatus,
+            CASE
+                WHEN a.asset_type = 'account' THEN COALESCE(ab.balance, 0)
+                ELSE NULL
+                END AS balance
+        FROM asset a
+                 LEFT JOIN account_balance ab ON a.asset_idx = ab.asset_idx
+        WHERE a.member_idx = #{memberIdx}
+    </select>
+
+    <update id="connectCard" parameterType="Integer">
+        UPDATE asset
+        SET connected_status = 1
+        WHERE asset_idx = #{assetIdx}
+    </update>
+
+    <update id="connectAccount" parameterType="Integer">
+        UPDATE asset
+        SET connected_status = 1
+        WHERE asset_idx = #{assetIdx}
+    </update>
+
+    <update id="disconnectCard" parameterType="Integer">
+        UPDATE asset
+        SET connected_status = 0
+        WHERE asset_idx = #{assetIdx}
+    </update>
+
+    <update id="disconnectAccount" parameterType="Integer">
+        UPDATE asset
+        SET connected_status = 0
+        WHERE asset_idx = #{assetIdx}
+    </update>
+</mapper>
